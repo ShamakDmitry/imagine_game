@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html ng-app="App">
+<head>
+    <title>Imagine (client)</title>
+
+    <link rel="stylesheet" type="text/css" href="assets/css/base.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css" />
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+
+    <script src="assets/js/jquery.min.js"></script>
+
+    <!--Angular START-->
+    <script src="assets/js/Angular/Library/angular.min.js"></script>
+    <script src="assets/js/Angular/Library/angular-route.min.js"></script>
+    <script src="assets/js/Angular/Custome/app.js"></script>
+
+    <script src="assets/js/Angular/Custome/Nested/ChatCTRL.js"></script>
+    <!--Angular END-->
+</head>
+
+<body ng-controller="Main">
+    <nav class="clearfix">
+        <div class="pull-left">
+            <h1 class="main-title">Imagine Online</h1>
+            <div class="nav-btn alpha-btn">Версия v0.1 (Не для IE). Минимум 3 игрока, иначе не интересно 8)</div>
+
+            <select language-select ng-model="lang" ng-options="language for language in ['eng', 'rus']"></select>
+        </div>
+
+        <div class="user pull-right">
+            <div class="toggle-btn" user-toggle>
+                {{getUserName(user)}}
+            </div>
+            <div class="hidden text-center">
+                <div class="btn alpha-btn" user-nav-btn="reconnect" ng-show="!isUserInList()">Reconnect</div>
+                <div class="btn alpha-btn" user-nav-btn="leave" ng-show="isUserInList()">LeaveGame</div>
+                <div class="btn alpha-btn" user-nav-btn="logout">LogOut</div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="view-content" ng-include="view"></div>
+</body>
+
+<script src="assets/js/langs.js"></script>
+<script src="assets/js/game.js"></script>
+<script src="assets/js/socket.io.js"></script>
+</html>

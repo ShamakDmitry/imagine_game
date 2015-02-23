@@ -1,0 +1,109 @@
+﻿<div class="control-panel" ng-if="debug">
+    <div class="alpha-btn" cpanel-btn="toggle">Hide/Show</div>
+    <div class="cover">
+        <div class="alpha-btn" cpanel-btn="update">update view</div>
+        <div class="alpha-btn" cpanel-btn="config">show config</div>
+        <div class="alpha-btn" cpanel-btn="userData">User data</div>
+        <div class="alpha-btn" cpanel-btn="gameData">Game data</div>
+        <div class="alpha-btn" cpanel-btn="gameRestart">Game restart</div>
+    </div>
+</div>
+
+<div class="text-center" ng-style="{ 'margin': '20px 0' }" ng-hide="user">
+    <input class="text-center" type="text" placeholder="user name" ng-model="userName" />
+    <div class="btn" log-btn>Log In</div>
+</div>
+
+<div ng-if="config.isAccessClosed">
+    <h3 class="text-center margin-top-large" ng-if="config.error">{{config.error}}</h3>
+</div>
+
+<div class="cover" ng-if="!config.isAccessClosed">
+    <div class="text-center" ng-show="user && !game" ng-style="{ 'margin': '20px 0' }">
+        <div class="cover" ng-if="canStartGame()">
+            <p><input type="text" id="minPlayers" ng-model="minPlayers" placeholder="min players" value="3" /></p>
+            <p><input type="text" id="maxRound" ng-model="maxRound" placeholder="max rounds" value="10" /></p>
+            <p><input type="text" id="maxScore" ng-model="maxScore" placeholder="max score" value="200" /></p>
+
+            <div class="start-btn" start-btn>{{text.startGame}}</div>
+        </div>
+        <div class="text-center" ng-if="!canStartGame()">{{text.waitOthers}}</div>
+        <div class="text-center">
+            <h4>{{text.players}}</h4>
+            <div class="player" ng-style="{ 'margin': '0 10px' }" ng-repeat="player in playersList">{{player}}</div>
+        </div>
+    </div>
+
+    <div class="table" ng-if="game">
+        <div class="table-top">
+            <h4>{{text.players}}</h4>
+            <div class="players">
+                <span class="player" ng-class="{'ready' : player.ready, 'pending' : !player.ready}" ng-repeat="player in game.group">{{player.name}} : {{player.score}}</span>
+            </div>
+        </div>
+        <div class="cover" ng-if="game.status != 'finished'">
+            <div class="table-center">
+                <h3 class="text-center">{{text.round}}: {{game.round.num}}</h3>
+                <h3 class="text-center">{{text.leader}}: {{getUserName(game.leader)}}</h3>
+                <h3 class="text-center">{{text.word}}: {{game.word}}</h3>
+                <h3 class="text-center">{{text.youMust}} {{getStageDescription()}}</h3>
+                <!--<h3 class="text-center">{{text.stage}}: {{game.round.stageNum}}</h3>-->
+
+                <div class="table-cards" ng-if="config.showSelected && game.selectedCards.length" ng-class="{'disabled' : !config.canGuess, 'normal' : config.canGuess}">
+                    <div class="card" ng-show="getShowTableCardAccess(item)" ng-class="{'yours' : item.userId == user.id, 'foreign' : item.userId != user.id}"  table-card="{{item.card}}" ng-style="getCardImage(item.card)" ng-repeat="item in game.selectedCards track by $index">
+                        <div ng-show="config.showSelectedCardInfo" class="card-owner">{{getUserName(item.userId)}}</div>
+                    </div>
+                </div>
+
+                <div class="status-btn" ng-show="!config.isStageEnd && config.canAction" status-btn>{{text.ready}}</div>
+                <div class="status-btn disabled" ng-show="(config.isStageEnd && !config.canAction) || getButtonsStatus()">{{text.wait}}</div>
+
+                <div class="status-btn large continue" ng-show="config.isStageEnd && !user.ready" round-btn="continue">{{text.startNewRound}}</div>
+                <div class="status-btn large finish" ng-show="config.isStageEnd && !user.ready" round-btn="end">{{text.endGame}}</div>
+            </div>
+
+            <div class="player-bottom">
+                <div class="cover text-center" ng-show="config.canWrite">
+                    <input type="text" ng-model="user.word"  word-input placeholder="{{text.inputPlaceholder}}" />
+                </div>
+                <div class="player-cards" ng-show="config.canSelect">
+                     <div class="card" ng-hide="user.ready && card != lastSelected" user-card="{{card}}" ng-style="getCardImage(card)" ng-repeat="card in user.cards"></div>
+                </div>
+            </div>
+        </div>
+        <div class="cover" ng-if="game.status == 'finished'">
+            <h3 class="text-center">{{text.finishTitle}}</h3>
+            <div class="cover text-center">
+                <div class="restart-btn" restart-btn>{{text.again}}</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="chat" ng-controller="Chat">
+        <div class="toggle-btn" chat-toggle ng-class="{'new-message': hasNewMessages}">
+            <div class="newMessageIcon"></div>
+        </div>
+        <div class="cover">
+            <div class="close-btn" chat-toggle></div>
+            <div class="chat-header">
+                <div class="players clearfix">
+                    <div class="player pull-left" ng-repeat="(key, player) in room.players">{{key}}</div>
+                </div>
+            </div>
+            <div class="chat-output">
+                <div class="message {{message.position}} {{message.cls}}" ng-repeat="message in chat">
+                    <div class="message-cover">
+                        <div class="author-name">{{message.author}}: </div>
+                        <div class="message-text">{{message.text}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input clearfix">
+                <div class="chat-btn" send-btn>Send</div>
+                <form class="input-cover">
+                    <input id="chat-msg" type="text" placeholder="Message" ng-model="chatInput" />
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
